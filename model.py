@@ -672,8 +672,30 @@ def training_epoch(net, optimizer, buffer, batch_size, policy_weight=1.0, value_
     
     return avg_metrics
 
-# Step 51 - self_play_iteration (not yet solved)
-# TODO: implement
+# Step 51 - self_play_iteration
+def self_play_iteration(net, optimizer, num_games, num_simulations, c_puct, batch_size, num_epochs=1, temperature=1.0):
+    # 1. Generate a fresh buffer of self-play games
+    buffer = generate_self_play_batch(net, num_games=num_games, num_simulations=num_simulations, c_puct=c_puct, temperature=temperature)
+    
+    # If the buffer is empty (e.g. num_games = 0), return zero losses for each epoch
+    if len(buffer) == 0:
+        zero_loss = {'total': 0.0, 'policy': 0.0, 'value': 0.0, 'l2': 0.0}
+        return {
+            'buffer_size': 0,
+            'losses': [zero_loss] * num_epochs
+        }
+    
+    # 2. Train the network on that buffer for num_epochs using training_epoch
+    losses = []
+    for _ in range(num_epochs):
+        epoch_loss = training_epoch(net, optimizer, buffer, batch_size=batch_size)
+        losses.append(epoch_loss)
+        
+    # 3. Return a dictionary containing the buffer size and the list of loss dicts
+    return {
+        'buffer_size': len(buffer),
+        'losses': losses
+    }
 
 # Step 52 - train_loop (not yet solved)
 # TODO: implement
