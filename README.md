@@ -62,7 +62,7 @@ python scaffold.py
 - [x] **50.** training_epoch
 - [x] **51.** self_play_iteration
 - [x] **52.** train_loop
-- [ ] **53.** random_policy_action
+- [x] **53.** random_policy_action
 - [ ] **54.** greedy_agent_action
 - [ ] **55.** play_one_match
 - [ ] **56.** match_win_rate
