@@ -56,7 +56,7 @@ python scaffold.py
 - [x] **44.** policy_loss_cross_entropy
 - [x] **45.** l2_regularization_loss
 - [x] **46.** combined_loss
-- [ ] **47.** encode_batch_states
+- [x] **47.** encode_batch_states
 - [ ] **48.** iterate_minibatches
 - [ ] **49.** training_step
 - [ ] **50.** training_epoch

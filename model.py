@@ -596,8 +596,13 @@ def combined_loss(predicted_log_probs, predicted_values, target_policy, target_v
     
     return total_loss, parts
 
-# Step 47 - encode_batch_states (not yet solved)
-# TODO: implement
+# Step 47 - encode_batch_states
+import torch
+
+def encode_batch_states(boards, to_plays):
+    # Call board_to_torch_tensor directly with board and to_play for each item, then stack
+    tensors = [board_to_torch_tensor(board, to_play) for board, to_play in zip(boards, to_plays)]
+    return torch.cat(tensors)
 
 # Step 48 - iterate_minibatches (not yet solved)
 # TODO: implement
