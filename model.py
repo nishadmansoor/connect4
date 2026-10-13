@@ -697,8 +697,22 @@ def self_play_iteration(net, optimizer, num_games, num_simulations, c_puct, batc
         'losses': losses
     }
 
-# Step 52 - train_loop (not yet solved)
-# TODO: implement
+# Step 52 - train_loop
+def train_loop(net, optimizer, num_iterations, num_games, num_simulations, c_puct, batch_size, num_epochs=1, temperature=1.0):
+    # Repeat self_play_iteration for num_iterations and collect the results into a list
+    history = []
+    for _ in range(num_iterations):
+        result = self_play_iteration(
+            net, optimizer, 
+            num_games=num_games, 
+            num_simulations=num_simulations, 
+            c_puct=c_puct, 
+            batch_size=batch_size, 
+            num_epochs=num_epochs, 
+            temperature=temperature
+        )
+        history.append(result)
+    return history
 
 # Step 53 - random_policy_action (not yet solved)
 # TODO: implement
