@@ -561,11 +561,40 @@ def policy_loss_cross_entropy(predicted_log_probs, target_policy):
     # TODO: compute -sum(target * log_probs) per row, then average over the batch
     return -torch.mean(torch.sum(target_policy * predicted_log_probs, dim=-1))
 
-# Step 45 - l2_regularization_loss (not yet solved)
-# TODO: implement
+# Step 45 - l2_regularization_loss
+def l2_regularization_loss(net):
+    # TODO: return the sum of squared L2 norms of all trainable parameters in net
+    return sum(torch.sum(p ** 2) for p in net.parameters() if p.requires_grad)
 
-# Step 46 - combined_loss (not yet solved)
-# TODO: implement
+# Step 46 - combined_loss
+import torch
+
+def value_loss_mse(predicted_values, target_values):
+    return torch.mean((predicted_values - target_values) ** 2)
+
+def policy_loss_cross_entropy(predicted_log_probs, target_policy):
+    return -torch.mean(torch.sum(target_policy * predicted_log_probs, dim=-1))
+
+def l2_regularization_loss(net):
+    return sum(torch.sum(p ** 2) for p in net.parameters() if p.requires_grad)
+
+def combined_loss(predicted_log_probs, predicted_values, target_policy, target_values, net, policy_weight=1.0, value_weight=1.0, l2_weight=1e-4):
+    # Compute the individual loss components using helper functions
+    policy_loss = policy_loss_cross_entropy(predicted_log_probs, target_policy)
+    value_loss = value_loss_mse(predicted_values, target_values)
+    l2_loss = l2_regularization_loss(net)
+    
+    # Combine using the given weights
+    total_loss = (policy_weight * policy_loss) + (value_weight * value_loss) + (l2_weight * l2_loss)
+    
+    # Store the unweighted components in a dictionary
+    parts = {
+        'policy': policy_loss,
+        'value': value_loss,
+        'l2': l2_loss
+    }
+    
+    return total_loss, parts
 
 # Step 47 - encode_batch_states (not yet solved)
 # TODO: implement
