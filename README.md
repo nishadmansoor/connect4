@@ -52,7 +52,7 @@ python scaffold.py
 - [x] **40.** play_self_play_game
 - [x] **41.** assign_value_targets
 - [x] **42.** generate_self_play_batch
-- [ ] **43.** value_loss_mse
+- [x] **43.** value_loss_mse
 - [ ] **44.** policy_loss_cross_entropy
 - [ ] **45.** l2_regularization_loss
 - [ ] **46.** combined_loss

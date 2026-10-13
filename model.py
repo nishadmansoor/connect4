@@ -546,8 +546,12 @@ def generate_self_play_batch(net, num_games, num_simulations, c_puct, temperatur
         buffer.extend(labelled_history)
     return buffer
 
-# Step 43 - value_loss_mse (not yet solved)
-# TODO: implement
+# Step 43 - value_loss_mse
+import torch
+
+def value_loss_mse(predicted_values, target_values):
+    # TODO: return the mean squared error between predicted and target values
+    return torch.mean((predicted_values - target_values) ** 2)
 
 # Step 44 - policy_loss_cross_entropy (not yet solved)
 # TODO: implement
