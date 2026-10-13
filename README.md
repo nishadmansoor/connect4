@@ -58,7 +58,7 @@ python scaffold.py
 - [x] **46.** combined_loss
 - [x] **47.** encode_batch_states
 - [x] **48.** iterate_minibatches
-- [ ] **49.** training_step
+- [x] **49.** training_step
 - [ ] **50.** training_epoch
 - [ ] **51.** self_play_iteration
 - [ ] **52.** train_loop

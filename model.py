@@ -618,8 +618,39 @@ def iterate_minibatches(buffer, batch_size, seed=None):
         batch_indices = indices[start_idx:start_idx + batch_size]
         yield [buffer[i] for i in batch_indices]
 
-# Step 49 - training_step (not yet solved)
-# TODO: implement
+# Step 49 - training_step
+import torch
+
+def training_step(net, optimizer, minibatch, policy_weight=1.0, value_weight=1.0, l2_weight=1e-4):
+    optimizer.zero_grad()
+    
+    boards = [item['board'] for item in minibatch]
+    to_plays = [item['to_play'] for item in minibatch]
+    target_policies = torch.tensor([item['policy'] for item in minibatch], dtype=torch.float32)
+    target_values = torch.tensor([item['value'] for item in minibatch], dtype=torch.float32).unsqueeze(-1)
+    
+    batch_tensor = encode_batch_states(boards, to_plays)
+    policy_logits, predicted_values = policy_value_forward(net, batch_tensor)
+    
+    masks = torch.stack([torch.tensor(action_mask(board), dtype=torch.float32) for board in boards])
+    
+    # Pass both policy_logits and masks to masked_log_softmax (or use masked_logits with masks)
+    predicted_log_probs = masked_log_softmax(policy_logits, masks)
+    
+    total_loss, parts = combined_loss(
+        predicted_log_probs, predicted_values, target_policies, target_values, 
+        net, policy_weight=policy_weight, value_weight=value_weight, l2_weight=l2_weight
+    )
+    
+    total_loss.backward()
+    optimizer.step()
+    
+    return {
+        'total': total_loss.item(),
+        'policy': parts['policy'].item(),
+        'value': parts['value'].item(),
+        'l2': parts['l2'].item()
+    }
 
 # Step 50 - training_epoch (not yet solved)
 # TODO: implement
