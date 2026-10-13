@@ -725,8 +725,29 @@ def random_policy_action(state, to_play, rng=None):
     legal_cols = valid_moves(state)
     return int(rng.choice(legal_cols))
 
-# Step 54 - greedy_agent_action (not yet solved)
-# TODO: implement
+# Step 54 - greedy_agent_action
+import torch
+
+def greedy_agent_action(net, state, to_play):
+    board_tensor = board_to_torch_tensor(encode_board(state, to_play), to_play)
+    
+    # If board_to_torch_tensor returns shape (1, 2, 6, 7) or (2, 2, 6, 7), 
+    # we want to make sure it's strictly 4D: (Batch, Channels, Height, Width)
+    if board_tensor.dim() == 5:
+        board_tensor = board_tensor.squeeze(0)
+    if board_tensor.dim() == 3:
+        board_tensor = board_tensor.unsqueeze(0)
+    elif board_tensor.dim() == 4 and board_tensor.shape[0] != 1:
+        # If it has 4 dimensions like (2, 2, 6, 7), take the first slice or correct it
+        board_tensor = board_tensor[0:1] # keeps batch dim as 1
+        
+    policy_logits, _ = policy_value_forward(net, board_tensor)
+    
+    logits = policy_logits.squeeze(0)
+    mask = torch.tensor(action_mask(state), dtype=torch.float32)
+    masked_logits = logits.masked_fill(mask == 0, float('-inf'))
+    
+    return int(torch.argmax(masked_logits).item())
 
 # Step 55 - play_one_match (not yet solved)
 # TODO: implement
