@@ -652,8 +652,25 @@ def training_step(net, optimizer, minibatch, policy_weight=1.0, value_weight=1.0
         'l2': parts['l2'].item()
     }
 
-# Step 50 - training_epoch (not yet solved)
-# TODO: implement
+# Step 50 - training_epoch
+def training_epoch(net, optimizer, buffer, batch_size, policy_weight=1.0, value_weight=1.0, l2_weight=1e-4, seed=None):
+    # Run one full pass over the self-play buffer and return the average of each loss component.
+    metrics = []
+    
+    for minibatch in iterate_minibatches(buffer, batch_size, seed=seed):
+        step_metrics = training_step(
+            net, optimizer, minibatch, 
+            policy_weight=policy_weight, 
+            value_weight=value_weight, 
+            l2_weight=l2_weight
+        )
+        metrics.append(step_metrics)
+    
+    # Compute the mean for each key across all minibatches
+    keys = ['total', 'policy', 'value', 'l2']
+    avg_metrics = {key: sum(m[key] for m in metrics) / len(metrics) for key in keys}
+    
+    return avg_metrics
 
 # Step 51 - self_play_iteration (not yet solved)
 # TODO: implement

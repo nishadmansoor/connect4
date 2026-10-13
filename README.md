@@ -59,7 +59,7 @@ python scaffold.py
 - [x] **47.** encode_batch_states
 - [x] **48.** iterate_minibatches
 - [x] **49.** training_step
-- [ ] **50.** training_epoch
+- [x] **50.** training_epoch
 - [ ] **51.** self_play_iteration
 - [ ] **52.** train_loop
 - [ ] **53.** random_policy_action
