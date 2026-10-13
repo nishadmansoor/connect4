@@ -563,8 +563,8 @@ def policy_loss_cross_entropy(predicted_log_probs, target_policy):
 
 # Step 45 - l2_regularization_loss
 def l2_regularization_loss(net):
-    # TODO: return the sum of squared L2 norms of all trainable parameters in net
-    return sum(torch.sum(p ** 2) for p in net.parameters() if p.requires_grad)
+    # Pass torch.tensor(0.0) as the start argument so it always returns a tensor
+    return sum((torch.sum(p ** 2) for p in net.parameters() if p.requires_grad), torch.tensor(0.0))
 
 # Step 46 - combined_loss
 import torch
