@@ -562,7 +562,11 @@ import torch
 def policy_loss_cross_entropy(predicted_log_probs, target_policy):
     """Cross-entropy between MCTS target policy and network log-probs. Returns scalar tensor."""
     # TODO: compute -sum(target * log_probs) per row, then average over the batch
-    return -torch.mean(torch.sum(target_policy * predicted_log_probs, dim=-1))
+    # Skip zero-target columns so 0 * -inf (illegal moves) doesn't produce nan
+    terms = torch.where(target_policy > 0,
+                        target_policy * predicted_log_probs,
+                        torch.zeros_like(predicted_log_probs))
+    return -torch.mean(torch.sum(terms, dim=-1))
 
 # Step 45 - l2_regularization_loss
 def l2_regularization_loss(net):
@@ -576,7 +580,10 @@ def value_loss_mse(predicted_values, target_values):
     return torch.mean((predicted_values - target_values) ** 2)
 
 def policy_loss_cross_entropy(predicted_log_probs, target_policy):
-    return -torch.mean(torch.sum(target_policy * predicted_log_probs, dim=-1))
+    terms = torch.where(target_policy > 0,
+                        target_policy * predicted_log_probs,
+                        torch.zeros_like(predicted_log_probs))
+    return -torch.mean(torch.sum(terms, dim=-1))
 
 def l2_regularization_loss(net):
     return sum(torch.sum(p ** 2) for p in net.parameters() if p.requires_grad)
