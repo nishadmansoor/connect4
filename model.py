@@ -4,10 +4,14 @@ AlphaZero on Connect-4 from Scratch
 Assembled from your step-by-step solutions.
 """
 
+import math
+import random
+
 import numpy as np
+import torch
+import torch.nn as nn
 
 # Step 1 - make_empty_board
-import numpy as np
 
 def make_empty_board():
     """Return a 6x7 integer numpy array of zeros representing an empty Connect-4 board."""
@@ -38,7 +42,6 @@ def drop_piece(board, column, player):
     return new_board
 
 # Step 4 - column_full
-import numpy as np
 
 def column_full(board, column):
     """Return True if `column` has no empty rows left."""
@@ -98,7 +101,6 @@ def four_in_a_row_diagonal_up_right(board):
     return 0
 
 # Step 10 - check_winner
-import numpy as np
 
 def check_winner(board):
     """Return 1 or 2 if that player has four in a row, else 0."""
@@ -146,7 +148,6 @@ def step_env(board, column, player):
     return new_board, done, winner, next_player
 
 # Step 15 - encode_board
-import numpy as np
 
 def encode_board(board, current_player):
     """Encode a 6x7 board as a (2, 6, 7) float32 tensor from current_player's view."""
@@ -158,7 +159,6 @@ def encode_board(board, current_player):
     return np.stack([player_plane, opponent_plane], axis=0)
 
 # Step 16 - board_to_torch_tensor
-import torch
 def board_to_torch_tensor(board, current_player):
     # TODO: encode the board and return it as a float32 torch tensor of shape (1, 2, 6, 7).
     encode = encode_board(board, current_player)
@@ -167,8 +167,6 @@ def board_to_torch_tensor(board, current_player):
     return tensor.unsqueeze(0)
 
 # Step 17 - init_conv_backbone
-import torch
-import torch.nn as nn
 def init_conv_backbone(in_channels=2, hidden_channels=16, num_layers=2):
     # TODO: Build a small convolutional backbone preserving the 6x7 spatial shape.
     layers = []
@@ -178,8 +176,6 @@ def init_conv_backbone(in_channels=2, hidden_channels=16, num_layers=2):
     return nn.Sequential(*layers)
 
 # Step 18 - init_policy_head
-import torch
-import torch.nn as nn
 
 def init_policy_head(hidden_channels=16, num_columns=7):
     """Return an nn.Module mapping (B, hidden_channels, 6, 7) -> (B, num_columns) logits."""
@@ -193,8 +189,6 @@ def init_policy_head(hidden_channels=16, num_columns=7):
     )
 
 # Step 19 - init_value_head
-import torch
-import torch.nn as nn
 
 def init_value_head(hidden_channels=16):
     """Return an nn.Module mapping (B, hidden_channels, 6, 7) -> (B, 1) in (-1, 1)."""
@@ -211,8 +205,6 @@ def init_value_head(hidden_channels=16):
     )
 
 # Step 20 - build_policy_value_net
-import torch
-import torch.nn as nn
 
 def build_policy_value_net(in_channels=2, hidden_channels=16, num_columns=7, num_layers=2):
     """Compose backbone + policy head + value head into one nn.Module."""
@@ -230,8 +222,6 @@ def build_policy_value_net(in_channels=2, hidden_channels=16, num_columns=7, num
     return net
 
 # Step 21 - policy_value_forward
-import torch
-import torch.nn as nn
 
 def policy_value_forward(net, encoded_board):
     """Run encoded_board (B,2,6,7) through net and return (logits, value)."""
@@ -239,7 +229,6 @@ def policy_value_forward(net, encoded_board):
     return net(encoded_board)
 
 # Step 22 - action_mask
-import numpy as np
 
 def action_mask(board):
     # TODO: return a length-7 boolean mask, True where the column is legal
@@ -249,7 +238,6 @@ def action_mask(board):
     return mask
 
 # Step 23 - masked_policy_logits
-import torch
 
 def masked_policy_logits(logits, mask):
     """Set logits at illegal columns to -inf.
@@ -267,7 +255,6 @@ def masked_policy_logits(logits, mask):
     return torch.where(mask, logits, float('-inf'))
 
 # Step 24 - masked_log_softmax
-import torch
 
 def masked_log_softmax(logits, mask):
     """Log-softmax of logits with illegal columns (mask=False) forced to -inf."""
@@ -276,7 +263,6 @@ def masked_log_softmax(logits, mask):
     return torch.log_softmax(masked_logits, dim=-1)
 
 # Step 25 - sample_action_from_policy
-import torch
 
 def sample_action_from_policy(logits, mask, temperature=1.0):
     """Sample a legal column from a tempered masked categorical policy."""
@@ -286,7 +272,6 @@ def sample_action_from_policy(logits, mask, temperature=1.0):
     return distance.sample().item()
 
 # Step 26 - greedy_action_from_policy
-import torch
 
 def greedy_action_from_policy(logits, mask):
     """Return the argmax legal column index from masked policy logits."""
@@ -314,7 +299,6 @@ def node_q_value(node):
     return node['value_sum'] / node['visit_count']
 
 # Step 29 - ucb_score
-import math
 
 def ucb_score(parent, child, c_puct=1.5):
     # TODO: return Q(child) + c_puct * prior * sqrt(N_parent) / (1 + N_child)
@@ -354,6 +338,7 @@ def select_leaf(root, c_puct):
 # Step 32 - evaluate_with_network
 def evaluate_with_network(net, state, to_play):
     # TODO: run net on encoded state and return (masked priors np.ndarray (7,), value float)
+    was_training = net.training
     net.eval()
 
     with torch.no_grad():
@@ -372,7 +357,8 @@ def evaluate_with_network(net, state, to_play):
             priors = priors / priors.sum()
             
         value = float(value_tensor.squeeze().item())
-        
+
+    net.train(was_training)  # restore the caller's mode so training isn't stuck in eval
     return priors, value
 
 # Step 33 - expand_node
@@ -478,22 +464,11 @@ def visit_count_policy(root, temperature=1.0):
 # Step 38 - mcts_choose_action
 def mcts_choose_action(state, to_play, net, num_simulations, c_puct, temperature=1.0):
     root = run_mcts(state, to_play, net, num_simulations, c_puct)
-    policy = visit_count_policy(root, temperature)
-    
-    if not isinstance(policy, torch.Tensor):
-        policy_tensor = torch.tensor(policy, dtype=torch.float32)
-    else:
-        policy_tensor = policy
-        
-    mask = action_mask(state)
-    action = sample_action_from_policy(policy_tensor, mask)
-
-    if isinstance(policy, torch.Tensor):
-        policy = policy.cpu().numpy()
-    elif not hasattr(policy, 'shape'):
-        policy = np.array(policy, dtype=np.float32)
-        
-    return int(action), policy
+    policy = np.asarray(visit_count_policy(root, temperature), dtype=np.float32)
+    # visit_count_policy already applied the temperature and gives 0 to illegal columns,
+    # so sample straight from these probabilities (they are not logits)
+    action = int(np.random.choice(len(policy), p=policy / policy.sum()))
+    return action, policy
 
 # Step 39 - record_self_play_step
 def record_self_play_step(history, board, policy, to_play):
@@ -551,14 +526,12 @@ def generate_self_play_batch(net, num_games, num_simulations, c_puct, temperatur
     return buffer
 
 # Step 43 - value_loss_mse
-import torch
 
 def value_loss_mse(predicted_values, target_values):
     # TODO: return the mean squared error between predicted and target values
     return torch.mean((predicted_values - target_values) ** 2)
 
 # Step 44 - policy_loss_cross_entropy
-import torch
 
 def policy_loss_cross_entropy(predicted_log_probs, target_policy):
     """Cross-entropy between MCTS target policy and network log-probs. Returns scalar tensor."""
@@ -575,19 +548,6 @@ def l2_regularization_loss(net):
     return sum((torch.sum(p ** 2) for p in net.parameters() if p.requires_grad), torch.tensor(0.0))
 
 # Step 46 - combined_loss
-import torch
-
-def value_loss_mse(predicted_values, target_values):
-    return torch.mean((predicted_values - target_values) ** 2)
-
-def policy_loss_cross_entropy(predicted_log_probs, target_policy):
-    terms = torch.where(target_policy > 0,
-                        target_policy * predicted_log_probs,
-                        torch.zeros_like(predicted_log_probs))
-    return -torch.mean(torch.sum(terms, dim=-1))
-
-def l2_regularization_loss(net):
-    return sum(torch.sum(p ** 2) for p in net.parameters() if p.requires_grad)
 
 def combined_loss(predicted_log_probs, predicted_values, target_policy, target_values, net, policy_weight=1.0, value_weight=1.0, l2_weight=1e-4):
     # Compute the individual loss components using helper functions
@@ -608,7 +568,6 @@ def combined_loss(predicted_log_probs, predicted_values, target_policy, target_v
     return total_loss, parts
 
 # Step 47 - encode_batch_states
-import torch
 
 def encode_batch_states(boards, to_plays):
     # Call board_to_torch_tensor directly with board and to_play for each item, then stack
@@ -616,7 +575,6 @@ def encode_batch_states(boards, to_plays):
     return torch.cat(tensors)
 
 # Step 48 - iterate_minibatches
-import numpy as np
 
 def iterate_minibatches(buffer, batch_size, seed=None):
     """Yield shuffled minibatches of step dicts of size <= batch_size."""
@@ -630,15 +588,15 @@ def iterate_minibatches(buffer, batch_size, seed=None):
         yield [buffer[i] for i in batch_indices]
 
 # Step 49 - training_step
-import torch
 
 def training_step(net, optimizer, minibatch, policy_weight=1.0, value_weight=1.0, l2_weight=1e-4):
+    net.train()
     optimizer.zero_grad()
-    
+
     boards = [item['board'] for item in minibatch]
     to_plays = [item['to_play'] for item in minibatch]
-    target_policies = torch.tensor([item['policy'] for item in minibatch], dtype=torch.float32)
-    target_values = torch.tensor([item['value'] for item in minibatch], dtype=torch.float32).unsqueeze(-1)
+    target_policies = torch.tensor(np.array([item['policy'] for item in minibatch]), dtype=torch.float32)
+    target_values = torch.tensor(np.array([item['value'] for item in minibatch]), dtype=torch.float32).unsqueeze(-1)
     
     batch_tensor = encode_batch_states(boards, to_plays)
     policy_logits, predicted_values = policy_value_forward(net, batch_tensor)
@@ -726,7 +684,6 @@ def train_loop(net, optimizer, num_iterations, num_games, num_simulations, c_puc
     return history
 
 # Step 53 - random_policy_action
-import numpy as np
 
 def random_policy_action(state, to_play, rng=None):
     """Pick a uniformly random legal column on the given board."""
@@ -737,7 +694,6 @@ def random_policy_action(state, to_play, rng=None):
     return int(rng.choice(legal_cols))
 
 # Step 54 - greedy_agent_action
-import torch
 
 def greedy_agent_action(net, state, to_play):
     board_tensor = board_to_torch_tensor(state, to_play)  # (1, 2, 6, 7)
@@ -797,7 +753,6 @@ def match_win_rate(agent_one, agent_two, num_matches, alternate_starts=True):
     return stats
 
 # Step 57 - evaluate_against_random
-import random
 
 def evaluate_against_random(network, num_matches, seed=None):
     rng = random.Random(seed)   # own RNG so the seed makes the random agent's moves reproducible

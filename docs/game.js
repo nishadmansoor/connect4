@@ -11,6 +11,7 @@
   let toPlay = 1;          // player 1 (red) always moves first
   let human = 1;
   let sims = 250;
+  const MAX_THINK_MS = 4000;  // slow phones: play the best move so far instead of stalling
   let over = true;
   let gameId = 0;          // bumps on new game so a stale AI search can't play into it
   let lastMove = -1;
@@ -82,14 +83,14 @@
     boardEl.classList.toggle('locked', over || toPlay !== human || !net);
   }
 
-  function showSearch(stats, progress) {
+  function showSearch(stats, done, total) {
     const max = Math.max(1, ...stats.visits);
     const top = stats.visits.indexOf(max);
     stats.visits.forEach((n, c) => {
       bars[c].style.height = (100 * n / max) + '%';
       bars[c].classList.toggle('top', c === top && n > 0);
     });
-    $('search-count').textContent = `${Math.round(progress * sims)} / ${sims} sims`;
+    $('search-count').textContent = `${done} / ${total} sims`;
     const pct = Math.round(stats.winChance * 100);
     $('win-pct').textContent = pct + '%';
     $('win-bar').style.width = pct + '%';
@@ -128,12 +129,15 @@
     statusEl.innerHTML = dot(3 - human) + 'AI is thinking…';
     render();
     const t0 = performance.now();
-    const { move, stats } = await think(net, board, toPlay, sims, (st, p) => { if (id === gameId) showSearch(st, p); });
+    const level = sims;  // the level can change mid-search; label progress with the one this search uses
+    const result = await think(net, board, toPlay, level, (st, n) => showSearch(st, n, level), () => id !== gameId, MAX_THINK_MS);
+    if (!result) return;  // abandoned: a new game started while this search was running
+    const { move, stats } = result;
     // Keep a short beat so fast (Easy) moves don't feel instant.
     const wait = Math.max(0, 350 - (performance.now() - t0));
     await new Promise((res) => setTimeout(res, wait));
     if (id !== gameId) return;
-    showSearch(stats, 1);
+    showSearch(stats, result.sims, level);
     if (!place(move)) statusEl.innerHTML = dot(human) + 'Your move. Click a column.';
   }
 
@@ -154,20 +158,9 @@
 
   // ---------------------------------------------------------------- load weights
 
-  function showTrainingStats(meta) {
-    if (!meta) return;
-    const items = [
-      [meta.self_play_games.toLocaleString(), 'self-play games'],
-      [meta.sims_per_move, 'MCTS simulations per move'],
-      [meta.train_minutes + ' min', 'training time (laptop CPU)'],
-      [meta.params.toLocaleString(), 'network parameters'],
-    ];
-    $('train-stats').innerHTML = items.map(([v, k]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
-  }
-
   fetch('weights.json')
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then((w) => { net = makeNet(w); showTrainingStats(w.meta); newGame(); })
+    .then((w) => { net = makeNet(w); newGame(); })
     .catch((err) => {
       console.error(err);
       statusEl.textContent = 'Could not load the network weights.';

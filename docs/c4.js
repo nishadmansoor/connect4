@@ -215,16 +215,20 @@
   }
 
   // Run `sims` simulations in small time-sliced chunks so the page stays responsive.
-  function think(net, board, toPlay, sims, onProgress) {
+  // If shouldStop() turns true (e.g. the player started a new game), stops early and resolves null.
+  // maxMs caps thinking time on slow devices: it then plays the best move found so far.
+  function think(net, board, toPlay, sims, onProgress, shouldStop, maxMs = Infinity) {
     const search = createSearch(net, board, toPlay);
+    const start = performance.now();
     return new Promise((resolve) => {
       let done = 0;
       function chunk() {
+        if (shouldStop && shouldStop()) return resolve(null);
         const t = performance.now();
         while (done < sims && performance.now() - t < 12) { search.run(5); done += 5; }
-        if (onProgress) onProgress(search.stats(), Math.min(done, sims) / sims);
-        if (done < sims) setTimeout(chunk, 0);
-        else resolve({ move: search.best(), stats: search.stats() });
+        if (onProgress) onProgress(search.stats(), Math.min(done, sims));
+        if (done < sims && performance.now() - start < maxMs) setTimeout(chunk, 0);
+        else resolve({ move: search.best(), stats: search.stats(), sims: Math.min(done, sims) });
       }
       chunk();
     });

@@ -1,0 +1,596 @@
+{
+ "meta": {
+  "self_play_games": 5120,
+  "sims_per_move": 160,
+  "train_minutes": 34,
+  "params": 30461,
+  "arch": {
+   "in_channels": 2,
+   "hidden_channels": 32,
+   "num_columns": 7,
+   "num_layers": 4
+  },
+  "iterations": 80
+ },
+ "history": [
+  {
+   "iteration": 1,
+   "policy": 1.799,
+   "value": 0.297
+  },
+  {
+   "iteration": 2,
+   "policy": 1.66,
+   "value": 0.256
+  },
+  {
+   "iteration": 3,
+   "policy": 1.569,
+   "value": 0.275
+  },
+  {
+   "iteration": 4,
+   "policy": 1.508,
+   "value": 0.283
+  },
+  {
+   "iteration": 5,
+   "policy": 1.473,
+   "value": 0.259,
+   "vs_tactical": {
+    "W": 19,
+    "L": 1,
+    "D": 0
+   }
+  },
+  {
+   "iteration": 6,
+   "policy": 1.439,
+   "value": 0.275
+  },
+  {
+   "iteration": 7,
+   "policy": 1.417,
+   "value": 0.301
+  },
+  {
+   "iteration": 8,
+   "policy": 1.402,
+   "value": 0.3
+  },
+  {
+   "iteration": 9,
+   "policy": 1.397,
+   "value": 0.331
+  },
+  {
+   "iteration": 10,
+   "policy": 1.395,
+   "value": 0.347,
+   "vs_tactical": {
+    "W": 17,
+    "L": 3,
+    "D": 0
+   }
+  },
+  {
+   "iteration": 11,
+   "policy": 1.382,
+   "value": 0.353
+  },
+  {
+   "iteration": 12,
+   "policy": 1.362,
+   "value": 0.368
+  },
+  {
+   "iteration": 13,
+   "policy": 1.344,
+   "value": 0.359
+  },
+  {
+   "iteration": 14,
+   "policy": 1.334,
+   "value": 0.367
+  },
+  {
+   "iteration": 15,
+   "policy": 1.332,
+   "value": 0.374,
+   "vs_tactical": {
+    "W": 19,
+    "L": 1,
+    "D": 0
+   }
+  },
+  {
+   "iteration": 16,
+   "policy": 1.325,
+   "value": 0.371
+  },
+  {
+   "iteration": 17,
+   "policy": 1.314,
+   "value": 0.383
+  },
+  {
+   "iteration": 18,
+   "policy": 1.31,
+   "value": 0.373
+  },
+  {
+   "iteration": 19,
+   "policy": 1.298,
+   "value": 0.385
+  },
+  {
+   "iteration": 20,
+   "policy": 1.293,
+   "value": 0.386,
+   "vs_tactical": {
+    "W": 20,
+    "L": 0,
+    "D": 0
+   }
+  },
+  {
+   "iteration": 21,
+   "policy": 1.286,
+   "value": 0.382
+  },
+  {
+   "iteration": 22,
+   "policy": 1.28,
+   "value": 0.385
+  },
+  {
+   "iteration": 23,
+   "policy": 1.275,
+   "value": 0.379
+  },
+  {
+   "iteration": 24,
+   "policy": 1.24,
+   "value": 0.386
+  },
+  {
+   "iteration": 25,
+   "policy": 1.219,
+   "value": 0.387,
+   "vs_tactical": {
+    "W": 20,
+    "L": 0,
+    "D": 0
+   }
+  },
+  {
+   "iteration": 26,
+   "policy": 1.202,
+   "value": 0.391
+  },
+  {
+   "iteration": 27,
+   "policy": 1.191,
+   "value": 0.394
+  },
+  {
+   "iteration": 28,
+   "policy": 1.179,
+   "value": 0.391
+  },
+  {
+   "iteration": 29,
+   "policy": 1.165,
+   "value": 0.384
+  },
+  {
+   "iteration": 30,
+   "policy": 1.149,
+   "value": 0.373,
+   "vs_tactical": {
+    "W": 19,
+    "L": 0,
+    "D": 1
+   }
+  },
+  {
+   "iteration": 31,
+   "policy": 1.129,
+   "value": 0.37
+  },
+  {
+   "iteration": 32,
+   "policy": 1.111,
+   "value": 0.352
+  },
+  {
+   "iteration": 33,
+   "policy": 1.103,
+   "value": 0.349
+  },
+  {
+   "iteration": 34,
+   "policy": 1.084,
+   "value": 0.346
+  },
+  {
+   "iteration": 35,
+   "policy": 1.077,
+   "value": 0.342,
+   "vs_tactical": {
+    "W": 18,
+    "L": 1,
+    "D": 1
+   }
+  },
+  {
+   "iteration": 36,
+   "policy": 1.07,
+   "value": 0.337
+  },
+  {
+   "iteration": 37,
+   "policy": 1.051,
+   "value": 0.331
+  },
+  {
+   "iteration": 38,
+   "policy": 1.043,
+   "value": 0.322
+  },
+  {
+   "iteration": 39,
+   "policy": 1.031,
+   "value": 0.311
+  },
+  {
+   "iteration": 40,
+   "policy": 1.02,
+   "value": 0.3,
+   "vs_tactical": {
+    "W": 19,
+    "L": 0,
+    "D": 1
+   }
+  },
+  {
+   "iteration": 41,
+   "policy": 1.01,
+   "value": 0.293
+  },
+  {
+   "iteration": 42,
+   "policy": 0.995,
+   "value": 0.29
+  },
+  {
+   "iteration": 43,
+   "policy": 0.987,
+   "value": 0.29
+  },
+  {
+   "iteration": 44,
+   "policy": 0.979,
+   "value": 0.274
+  },
+  {
+   "iteration": 45,
+   "policy": 0.97,
+   "value": 0.263,
+   "vs_tactical": {
+    "W": 17,
+    "L": 2,
+    "D": 1
+   }
+  },
+  {
+   "iteration": 46,
+   "policy": 0.969,
+   "value": 0.264
+  },
+  {
+   "iteration": 47,
+   "policy": 0.965,
+   "value": 0.253
+  },
+  {
+   "iteration": 48,
+   "policy": 0.96,
+   "value": 0.245
+  },
+  {
+   "iteration": 49,
+   "policy": 0.954,
+   "value": 0.234
+  },
+  {
+   "iteration": 50,
+   "policy": 0.953,
+   "value": 0.237,
+   "vs_tactical": {
+    "W": 20,
+    "L": 0,
+    "D": 0
+   }
+  },
+  {
+   "iteration": 51,
+   "policy": 0.95,
+   "value": 0.237
+  },
+  {
+   "iteration": 52,
+   "policy": 0.942,
+   "value": 0.232
+  },
+  {
+   "iteration": 53,
+   "policy": 0.932,
+   "value": 0.222
+  },
+  {
+   "iteration": 54,
+   "policy": 0.921,
+   "value": 0.209
+  },
+  {
+   "iteration": 55,
+   "policy": 0.914,
+   "value": 0.209,
+   "vs_tactical": {
+    "W": 17,
+    "L": 2,
+    "D": 1
+   }
+  },
+  {
+   "iteration": 56,
+   "policy": 0.92,
+   "value": 0.21
+  },
+  {
+   "iteration": 57,
+   "policy": 0.923,
+   "value": 0.216
+  },
+  {
+   "iteration": 58,
+   "policy": 0.929,
+   "value": 0.232
+  },
+  {
+   "iteration": 59,
+   "policy": 0.94,
+   "value": 0.228
+  },
+  {
+   "iteration": 60,
+   "policy": 0.941,
+   "value": 0.225,
+   "vs_tactical": {
+    "W": 19,
+    "L": 0,
+    "D": 1
+   }
+  },
+  {
+   "iteration": 61,
+   "policy": 0.948,
+   "value": 0.228
+  },
+  {
+   "iteration": 62,
+   "policy": 0.951,
+   "value": 0.224
+  },
+  {
+   "iteration": 63,
+   "policy": 0.962,
+   "value": 0.236
+  },
+  {
+   "iteration": 64,
+   "policy": 0.966,
+   "value": 0.234
+  },
+  {
+   "iteration": 65,
+   "policy": 0.975,
+   "value": 0.241,
+   "vs_tactical": {
+    "W": 16,
+    "L": 1,
+    "D": 3
+   }
+  },
+  {
+   "iteration": 66,
+   "policy": 0.981,
+   "value": 0.237
+  },
+  {
+   "iteration": 67,
+   "policy": 0.985,
+   "value": 0.233
+  },
+  {
+   "iteration": 68,
+   "policy": 0.993,
+   "value": 0.236
+  },
+  {
+   "iteration": 69,
+   "policy": 1.002,
+   "value": 0.244
+  },
+  {
+   "iteration": 70,
+   "policy": 1.015,
+   "value": 0.248,
+   "vs_tactical": {
+    "W": 19,
+    "L": 0,
+    "D": 1
+   }
+  },
+  {
+   "iteration": 71,
+   "policy": 1.022,
+   "value": 0.249
+  },
+  {
+   "iteration": 72,
+   "policy": 1.03,
+   "value": 0.253
+  },
+  {
+   "iteration": 73,
+   "policy": 1.04,
+   "value": 0.258
+  },
+  {
+   "iteration": 74,
+   "policy": 1.052,
+   "value": 0.266
+  },
+  {
+   "iteration": 75,
+   "policy": 1.059,
+   "value": 0.279,
+   "vs_tactical": {
+    "W": 20,
+    "L": 0,
+    "D": 0
+   }
+  },
+  {
+   "iteration": 76,
+   "policy": 1.076,
+   "value": 0.276
+  },
+  {
+   "iteration": 77,
+   "policy": 1.085,
+   "value": 0.285
+  },
+  {
+   "iteration": 78,
+   "policy": 1.089,
+   "value": 0.291
+  },
+  {
+   "iteration": 79,
+   "policy": 1.094,
+   "value": 0.282
+  },
+  {
+   "iteration": 80,
+   "policy": 1.099,
+   "value": 0.285,
+   "vs_tactical": {
+    "W": 18,
+    "L": 0,
+    "D": 2
+   }
+  }
+ ],
+ "head_to_head": [
+  {
+   "opponent": "Random mover",
+   "setting": "Network only",
+   "games": 20,
+   "W": 20,
+   "L": 0,
+   "D": 0
+  },
+  {
+   "opponent": "Random mover",
+   "setting": "Easy (50 sims)",
+   "games": 20,
+   "W": 20,
+   "L": 0,
+   "D": 0
+  },
+  {
+   "opponent": "Random mover",
+   "setting": "Medium (250 sims)",
+   "games": 20,
+   "W": 20,
+   "L": 0,
+   "D": 0
+  },
+  {
+   "opponent": "Random mover",
+   "setting": "Hard (1000 sims)",
+   "games": 20,
+   "W": 20,
+   "L": 0,
+   "D": 0
+  },
+  {
+   "opponent": "Win-or-block bot",
+   "setting": "Network only",
+   "games": 20,
+   "W": 13,
+   "L": 5,
+   "D": 2
+  },
+  {
+   "opponent": "Win-or-block bot",
+   "setting": "Easy (50 sims)",
+   "games": 20,
+   "W": 18,
+   "L": 0,
+   "D": 2
+  },
+  {
+   "opponent": "Win-or-block bot",
+   "setting": "Medium (250 sims)",
+   "games": 20,
+   "W": 19,
+   "L": 0,
+   "D": 1
+  },
+  {
+   "opponent": "Win-or-block bot",
+   "setting": "Hard (1000 sims)",
+   "games": 20,
+   "W": 20,
+   "L": 0,
+   "D": 0
+  },
+  {
+   "opponent": "Minimax, 4 moves deep",
+   "setting": "Network only",
+   "games": 20,
+   "W": 10,
+   "L": 7,
+   "D": 3
+  },
+  {
+   "opponent": "Minimax, 4 moves deep",
+   "setting": "Easy (50 sims)",
+   "games": 20,
+   "W": 17,
+   "L": 1,
+   "D": 2
+  },
+  {
+   "opponent": "Minimax, 4 moves deep",
+   "setting": "Medium (250 sims)",
+   "games": 20,
+   "W": 14,
+   "L": 6,
+   "D": 0
+  },
+  {
+   "opponent": "Minimax, 4 moves deep",
+   "setting": "Hard (1000 sims)",
+   "games": 20,
+   "W": 8,
+   "L": 2,
+   "D": 10
+  }
+ ],
+ "evaluated_at_iteration": 80
+}
