@@ -754,7 +754,6 @@ def greedy_agent_action(net, state, to_play):
 
 # Step 55 - play_one_match
 def play_one_match(agent_one, agent_two, starting_player=1):
-    # TODO: play a full Connect-4 game between two callable agents and return the winner code.
     state = make_empty_board()
     to_play = starting_player
 
@@ -763,13 +762,11 @@ def play_one_match(agent_one, agent_two, starting_player=1):
             action = agent_one(state, to_play)
         else:
             action = agent_two(state, to_play)
-        
-        state = step_env(state, action, to_play)
 
-        if is_terminal(state):
-            return check_winner(state)
-        
-        to_play = other_player(to_play)
+        state, done, winner, to_play = step_env(state, action, to_play)
+
+        if done:
+            return winner
 
 # Step 56 - match_win_rate
 def match_win_rate(agent_one, agent_two, num_matches, alternate_starts=True):
@@ -803,42 +800,28 @@ def match_win_rate(agent_one, agent_two, num_matches, alternate_starts=True):
 
 # Step 57 - evaluate_against_random
 import random
-import torch
 
-def evaluate_against_random(net, num_matches, seed=None):
-    """
-    Measures how often the greedy network agent beats a uniform-random baseline
-    over num_matches Connect-4 games.
-    """
-    if seed is not None:
-        random.seed(seed)
-        
-    stats = {'wins': 0, 'losses': 0, 'draws': 0}
-    
+def evaluate_against_random(network, num_matches, seed=None):
+    rng = random.Random(seed)   # own RNG so the seed makes the random agent's moves reproducible
+
+    def greedy_agent(state, to_play):
+        return greedy_agent_action(network, state, to_play)
+
+    def random_agent(state, to_play):
+        return rng.choice(valid_moves(state))
+
+    results = {"wins": 0, "losses": 0, "draws": 0}
+
     for i in range(num_matches):
-        env = Connect4()
-        
-        current_player = 1 if (i % 2 == 0) else 2
-        
-        done = False
-        while not done:
-            if env.current_player == 1:
-                state = env.get_state() 
-                action = get_greedy_action(net, env)
-            else:
-                valid_actions = env.get_valid_actions()
-                action = random.choice(valid_actions)
-                
-            env.step(action)
-            done = env.is_terminal()
-            
-        result = env.get_outcome() 
-        if result == 1:
-            stats['wins'] += 1
-        elif result == -1:
-            stats['losses'] += 1
+        starting_player = 1 if i % 2 == 0 else 2
+        outcome = play_one_match(greedy_agent, random_agent, starting_player)
+
+        if outcome == 1:
+            results["wins"] += 1
+        elif outcome == 2:
+            results["losses"] += 1
         else:
-            stats['draws'] += 1
-            
-    return stats
+            results["draws"] += 1
+
+    return results
 
