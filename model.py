@@ -169,15 +169,13 @@ def board_to_torch_tensor(board, current_player):
 # Step 17 - init_conv_backbone
 import torch
 import torch.nn as nn
-def init_conv_backbone(in_channels=2, hidden_channels=16):
+def init_conv_backbone(in_channels=2, hidden_channels=16, num_layers=2):
     # TODO: Build a small convolutional backbone preserving the 6x7 spatial shape.
-    
-    return nn.Sequential(
-        nn.Conv2d(in_channels, hidden_channels, kernel_size=3, padding=1),
-        nn.ReLU(),
-        nn.Conv2d(hidden_channels,hidden_channels,kernel_size=3,padding=1),
-        nn.ReLU()
-    )
+    layers = []
+    for i in range(num_layers):
+        layers.append(nn.Conv2d(in_channels if i == 0 else hidden_channels, hidden_channels, kernel_size=3, padding=1))
+        layers.append(nn.ReLU())
+    return nn.Sequential(*layers)
 
 # Step 18 - init_policy_head
 import torch
@@ -216,11 +214,11 @@ def init_value_head(hidden_channels=16):
 import torch
 import torch.nn as nn
 
-def build_policy_value_net(in_channels=2, hidden_channels=16, num_columns=7):
+def build_policy_value_net(in_channels=2, hidden_channels=16, num_columns=7, num_layers=2):
     """Compose backbone + policy head + value head into one nn.Module."""
     # TODO: build an nn.Module with backbone, policy_head, value_head attributes
     net = nn.Module()
-    net.backbone = init_conv_backbone(in_channels=in_channels, hidden_channels=hidden_channels)
+    net.backbone = init_conv_backbone(in_channels=in_channels, hidden_channels=hidden_channels, num_layers=num_layers)
     net.policy_head = init_policy_head(hidden_channels=hidden_channels, num_columns=num_columns)
     net.value_head = init_value_head(hidden_channels=hidden_channels)
     
@@ -399,9 +397,12 @@ def expand_node(node, priors):
 # Step 34 - backup_value
 def backup_value(leaf, value):
     # TODO: walk from leaf up through parents, updating visit_count and value_sum with alternating signs
+    # `value` is from the leaf's to_play perspective. Each node stores value from the
+    # perspective of the player who moved INTO it (its parent's to_play), because that's
+    # who reads Q(child) when choosing, so the leaf gets -value and signs alternate upward.
     current = leaf
-    current_value = value
-    
+    current_value = -value
+
     while current is not None:
         current['visit_count'] += 1
         current['value_sum'] += current_value
@@ -739,19 +740,9 @@ def random_policy_action(state, to_play, rng=None):
 import torch
 
 def greedy_agent_action(net, state, to_play):
-    board_tensor = board_to_torch_tensor(encode_board(state, to_play), to_play)
-    
-    # If board_to_torch_tensor returns shape (1, 2, 6, 7) or (2, 2, 6, 7), 
-    # we want to make sure it's strictly 4D: (Batch, Channels, Height, Width)
-    if board_tensor.dim() == 5:
-        board_tensor = board_tensor.squeeze(0)
-    if board_tensor.dim() == 3:
-        board_tensor = board_tensor.unsqueeze(0)
-    elif board_tensor.dim() == 4 and board_tensor.shape[0] != 1:
-        # If it has 4 dimensions like (2, 2, 6, 7), take the first slice or correct it
-        board_tensor = board_tensor[0:1] # keeps batch dim as 1
-        
-    policy_logits, _ = policy_value_forward(net, board_tensor)
+    board_tensor = board_to_torch_tensor(state, to_play)  # (1, 2, 6, 7)
+    with torch.no_grad():
+        policy_logits, _ = policy_value_forward(net, board_tensor)
     
     logits = policy_logits.squeeze(0)
     mask = torch.tensor(action_mask(state), dtype=torch.float32)

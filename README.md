@@ -2,10 +2,24 @@
 
 Build a complete AlphaZero-style agent for Connect-4, from the bare game rules to a self-play training loop that pits a policy-value network guided by PUCT Monte Carlo Tree Search against itself. Along the way you implement the board engine, neural network, MCTS, self-play data generation, training, and evaluation against baselines.
 
+**Play it:** https://nishad.xyz/connect4-alphazero/
+
 ## How to run
 
 ```bash
-python scaffold.py
+python scaffold.py   # quick end-to-end demo of every step (a few seconds)
+python train.py      # real self-play training (~30 min on a laptop CPU)
+```
+
+`train.py` saves `checkpoint.pt` and exports `docs/weights.json`, which the web demo in
+`docs/` loads. The browser runs the same network and PUCT search in plain JavaScript
+(`docs/c4.js`), so there's no server. Use `python train.py --resume` to keep training from
+the last checkpoint, and `python train.py --help` for the knobs (games, simulations, etc.).
+
+To preview the site locally:
+
+```bash
+python -m http.server 8000 --directory docs
 ```
 
 ## Steps
