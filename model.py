@@ -63,8 +63,11 @@ def four_in_a_row_horizontal(board):
     # TODO: scan every row for four consecutive matching non-zero pieces horizontally
     for row in range(6):
         for col in range(4):
-            if board[row,col] != 0 and board[row,col] == board[row,col + 1] == board[row,col + 2] == board[row,col + 3]:
-                return board[row,col]
+            if (board[row, col] != 0 and 
+                board[row, col] == board[row, col + 1] and 
+                board[row, col] == board[row, col + 2] and 
+                board[row, col] == board[row, col + 3]):
+                return board[row, col]
     return 0
 
 # Step 7 - four_in_a_row_vertical
@@ -751,28 +754,22 @@ def greedy_agent_action(net, state, to_play):
 
 # Step 55 - play_one_match
 def play_one_match(agent_one, agent_two, starting_player=1):
-    board = make_empty_board()
-    current_player = starting_player
-    
+    # TODO: play a full Connect-4 game between two callable agents and return the winner code.
+    state = make_empty_board()
+    to_play = starting_player
+
     while True:
-        # 1. Get action from the current agent
-        if current_player == 1:
-            action = agent_one(board, current_player)
+        if to_play == 1:
+            action = agent_one(state, to_play)
         else:
-            action = agent_two(board, current_player)
-            
-        # 2. Step the environment safely by indexing
-        step_result = step_env(board, current_player, action)
-        board = step_result[0]
-        winner = step_result[1]
-        is_done = step_result[2]
+            action = agent_two(state, to_play)
         
-        # 3. Check if the game has ended
-        if is_done:
-            return winner  # 1 for agent_one, 2 for agent_two, 0 for draw
-            
-        # 4. Switch player for the next turn
-        current_player = other_player(current_player)
+        state = step_env(state, action, to_play)
+
+        if is_terminal(state):
+            return check_winner(state)
+        
+        to_play = other_player(to_play)
 
 # Step 56 - match_win_rate
 def match_win_rate(agent_one, agent_two, num_matches, alternate_starts=True):
