@@ -749,12 +749,99 @@ def greedy_agent_action(net, state, to_play):
     
     return int(torch.argmax(masked_logits).item())
 
-# Step 55 - play_one_match (not yet solved)
-# TODO: implement
+# Step 55 - play_one_match
+def play_one_match(agent_one, agent_two, starting_player=1):
+    board = make_empty_board()
+    current_player = starting_player
+    
+    while True:
+        # 1. Get action from the current agent
+        if current_player == 1:
+            action = agent_one(board, current_player)
+        else:
+            action = agent_two(board, current_player)
+            
+        # 2. Step the environment safely by indexing
+        step_result = step_env(board, current_player, action)
+        board = step_result[0]
+        winner = step_result[1]
+        is_done = step_result[2]
+        
+        # 3. Check if the game has ended
+        if is_done:
+            return winner  # 1 for agent_one, 2 for agent_two, 0 for draw
+            
+        # 4. Switch player for the next turn
+        current_player = other_player(current_player)
 
-# Step 56 - match_win_rate (not yet solved)
-# TODO: implement
+# Step 56 - match_win_rate
+def match_win_rate(agent_one, agent_two, num_matches, alternate_starts=True):
+    stats = {'wins': 0, 'losses': 0, 'draws': 0}
+    
+    for i in range(num_matches):
+        if alternate_starts and (i % 2 == 1):
+            # Alternate starts: agent_two goes first, agent_one goes second
+            # From agent_one's perspective, if agent_two wins, it's a loss for agent_one.
+            winner = play_one_match(agent_two, agent_one, starting_player=1)
+            # Invert winner since agents were swapped:
+            # If winner == 1, agent_two won -> loss for agent_one
+            # If winner == 2, agent_one won -> win for agent_one
+            if winner == 2:
+                stats['wins'] += 1
+            elif winner == 1:
+                stats['losses'] += 1
+            else:
+                stats['draws'] += 1
+        else:
+            # Normal start: agent_one goes first
+            winner = play_one_match(agent_one, agent_two, starting_player=1)
+            if winner == 1:
+                stats['wins'] += 1
+            elif winner == 2:
+                stats['losses'] += 1
+            else:
+                stats['draws'] += 1
+                
+    return stats
 
-# Step 57 - evaluate_against_random (not yet solved)
-# TODO: implement
+# Step 57 - evaluate_against_random
+import random
+import torch
+
+def evaluate_against_random(net, num_matches, seed=None):
+    """
+    Measures how often the greedy network agent beats a uniform-random baseline
+    over num_matches Connect-4 games.
+    """
+    if seed is not None:
+        random.seed(seed)
+        
+    stats = {'wins': 0, 'losses': 0, 'draws': 0}
+    
+    for i in range(num_matches):
+        env = Connect4()
+        
+        current_player = 1 if (i % 2 == 0) else 2
+        
+        done = False
+        while not done:
+            if env.current_player == 1:
+                state = env.get_state() 
+                action = get_greedy_action(net, env)
+            else:
+                valid_actions = env.get_valid_actions()
+                action = random.choice(valid_actions)
+                
+            env.step(action)
+            done = env.is_terminal()
+            
+        result = env.get_outcome() 
+        if result == 1:
+            stats['wins'] += 1
+        elif result == -1:
+            stats['losses'] += 1
+        else:
+            stats['draws'] += 1
+            
+    return stats
 
