@@ -108,5 +108,3 @@ docs/          the website (GitHub Pages)
   results.js   renders the results section from results.json
 assets/        README images
 ```
-
-Based on [Deep-ML](https://deep-ml.com)'s guided AlphaZero project.
